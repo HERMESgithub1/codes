@@ -1,0 +1,142 @@
+using System;
+
+//Spořící prasátko - Praspo
+//lze do něj vkládat peníze
+//lze rozbít (kolik v něm bylo)
+
+namespace Programovani_10
+{
+    class Interval
+    {   // (1;2), (1;1), (NaN; NaN) prázdný má obrácné meze 
+        private double a;
+        private double b;
+        private bool empty;
+        public Interval() //prázdný interval
+        {
+            this.a = double.NaN;
+            this.b = double.NaN;
+
+            //double.NaN == double.NaN; porovnávání NaN s NaN => false 
+            //testování hodnoty NaN double.IsNan(this.a);
+        }
+
+        public Interval(int x) //jednoprvkový interval
+        {
+            
+        }
+
+        public Interval(double a, double b) //dvouprvkový interval
+        {
+
+        }
+
+        public Interval Intersection(Interval that) //průnik, na this voláme do that předáváme 
+        {
+
+        }
+
+        //<summary>
+        //Vrátí délku intervalu
+        //</summary>
+        //<returns> Délku intervalu, tj. b-a, je-li interval prázdný, pak vrátí NaN </returns>
+
+        public double Length()
+        {
+
+        }
+
+    }
+    class Praspo
+    {
+        private int castka = 0; //datový člen (data field)
+        private bool rozbite = false;
+        private int kapacita;
+        private string pin;
+
+
+        public Praspo(int kapacita = Int32.MaxValue, string pin = "")
+        {
+            this.kapacita = kapacita;
+            if(pin.Length != 4 && pin.Length != 0) // !a && !b <=> !(a || b)
+            {    
+                throw new Exception(message:$"PIN má špatnou délku (délka se {pin.Length}, má být 4)");
+            }
+            foreach (char znak in pin)
+            {
+                if(!"0123456789".Contains(znak.ToString()))
+                {
+                    throw new Exception(message: "Neplatný znak v PINu");
+                }
+            }
+            this.pin = pin;
+        }
+
+
+        public void Pridej(int castka)
+        {
+            if(!this.rozbite) //jestliže není rozbité
+            {
+                int pc = this.castka;
+                this.castka += castka;
+                if (this.castka > this.kapacita)
+                {
+                    this.castka = pc; //dodatečná částka se ignoruje
+                }
+            }
+            else
+            {
+                throw new Exception(message: "Rozbité prasátko");
+            }
+        }
+
+        public int BezpecnePridej(int castka)
+        {
+            int budouci_castka = this.castka + castka;
+            if(budouci_castka > this.kapacita)
+            {
+                this.castka = this.kapacita;
+                return budouci_castka - this.kapacita;
+            }
+            else
+            {
+                this.castka = budouci_castka;
+                return 0;
+            }
+        }
+
+        public int Rozbij()
+        {
+            return this.Rozbij(pin:"");
+        }
+
+        public int Rozbij(string pin)
+        {
+            if (pin != this.pin)
+            {
+                throw new Exception(message: "Chybný pin");
+            }
+            this.rozbite = true;
+            return this.castka;
+        }
+    }
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Praspo p = new Praspo(kapacita:100, pin:""); //(kapacita: 100)
+            p.BezpecnePridej(castka:10);
+            p.BezpecnePridej(castka:50);
+            if (p.BezpecnePridej(castka:50)  > 0){
+                Console.WriteLine("Přeplnění prasátka");
+            }
+            int castka = p.Rozbij(pin:"1234");
+            Console.WriteLine(castka); //vypíše 60
+
+            p.Pridej(castka:100); //vyjimka
+
+
+
+            Console.ReadKey();
+        }
+    }
+}
