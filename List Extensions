@@ -1,0 +1,72 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+
+namespace exercises
+{
+    static class ListExtensions
+    {
+        public static string ToJson(this List<string> aList)
+        {
+            StringBuilder result = new StringBuilder ("[");
+            for(int i = 0; i < aList.Count; i++)
+            {
+                string item = aList[i];
+                item = item.Replace("\\", "\\\\");
+                item = item.Replace("\"", "\\\"");
+                result.Append("\"" + item + "\"" + (i < aList.Count - 1 ? "," : ""));  
+            }
+
+            result.Append("]");
+            return result.ToString();
+        }
+        public static string maxLength(this List<string> aList)
+        {
+            int maxLength = int.MinValue;
+            string max = "";
+
+            foreach (var s in aList)
+            {
+                if(s.Length > maxLength)
+                {
+                    maxLength = s.Length;
+                    max = s;
+                }
+            }
+            return max;
+        }
+        public static int totalLength(this List<string> aList)
+        {
+            int suma = 0;
+            foreach (var item in aList)
+            {
+                suma += item.Length;
+            }
+            return suma;
+        }
+    }
+  class Program
+    {
+        static void Main(string[] args)
+        {
+            List<string> mesta =  new List<string>(50);
+            mesta.Add("Děčín");
+            mesta.Add("Česká Kamenice");
+            mesta.Add("Roudnice nad Labem");
+            mesta.Add("Brandýs nad Labem-Stará Boleslav");
+
+            mesta.Sort();
+
+
+
+            Console.WriteLine(mesta.Count);
+            Console.WriteLine(mesta.ToJson());
+            Console.WriteLine(mesta.maxLength());
+            Console.WriteLine(mesta.totalLength());
+
+            
+            Console.ReadKey();
+        }
+    }
+}
