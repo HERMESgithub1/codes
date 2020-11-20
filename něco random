@@ -1,0 +1,115 @@
+using System;
+using System.Collections.Generic;
+using System.Security.Permissions;
+
+
+class SkleroticStringList
+{
+    private List<string> memory;
+    private List<int> occurence;
+    private int capacity;
+    private Random r;
+    public SkleroticStringList(int capacity)
+    {
+        this.memory = new List<string>();
+        this.occurence = new List<int>();
+        this.capacity = capacity;
+        r = new Random();
+    }
+
+    public void Add(string item)
+    {
+        if (memory.Contains(item))
+        {
+            int idx = memory.IndexOf(item);
+            occurence[idx]++;
+        }
+        
+        if (this.memory.Count < this.capacity)
+        {
+            this.memory.Add(item);
+            this.occurence.Add(1);
+        }
+        else
+        {
+            int index = r.Next(memory.Count);
+            this.memory[index] = item;
+            this.occurence[index] = 1;
+        }
+    }
+
+    public List<string> AllItems()
+    {
+        return new List<string>(this.memory);
+    }
+
+    public int Count {
+        get {
+            return memory.Count;
+        }
+    }
+
+    public bool Contains(string wanted)
+    {
+        return memory.Contains(wanted);
+    }
+
+    public void Clear()
+    {
+        this.memory.Clear();
+    }
+
+    public int Capacity
+    {
+        get
+        {
+            return this.capacity;
+        }
+        set
+        {
+            if (value < memory.Count)
+            {
+                memory.RemoveRange(value, memory.Count - value);
+                memory.RemoveRange(value, memory.Count - value);
+            }
+            this.capacity = value;
+        }
+    }
+
+    private int RandomIndexWithDistribution()
+    {
+        
+    }
+}
+
+internal class Program
+{
+    public static void Main(string[] args)
+    {
+        SkleroticStringList s = new SkleroticStringList(5);
+        for (int i = 1; i <= 10; i++)
+        {
+            s.Add(i.ToString());
+        }
+
+        s.Capacity = 0; 
+        s.Capacity = 100; //setter
+
+        Console.WriteLine(s.Capacity); //getter
+        s.Add("test");
+
+        //Console.WriteLine( s.Count );
+        // nelze použít s.Count = 10;
+        
+        foreach (string jmeno in s.AllItems())
+        {
+            Console.WriteLine(jmeno);
+        }
+
+        //Console.WriteLine(s.Contains("5"));
+        
+        
+    }
+}
+
+
