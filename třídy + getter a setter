@@ -1,0 +1,95 @@
+using System;
+using System.Collections.Generic;
+
+namespace ConsoleApp1
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Clovek kacka = new Clovek("Katerina", "Michala", 13);
+            Clovek gabriela = new Clovek("Gabca", "Ctiradka", 16);
+
+            kacka.seznamSe(gabriela);
+            gabriela.seznamSe(kacka);
+
+            Clovek gerti = new Clovek("Gertruda", "Gerticka", 19);
+
+            Clovek.seznamVsechny(new List<Clovek> { kacka, gabriela, gerti });
+
+            Console.WriteLine(kacka.Id);
+            Console.WriteLine(gabriela.Id);
+            Console.WriteLine(gerti.Id);
+        }
+    }
+
+    class Clovek
+    {
+        //field members = vlastnosti
+        private string jmeno;
+        private int vek;
+        private int hodnoceni;
+        private string altjmeno;
+        public static int id = 0;
+
+        //konstruktor
+        public Clovek(string jmeno, string altjmeno, int vek){
+            id += 1;
+            this.jmeno = jmeno;
+            this.altjmeno = altjmeno;
+            this.hodnoceni = 1;
+            if (vek < 15)
+            {
+                Console.WriteLine("Nemas zde co pohledavat!");
+                this.vek = 15;
+            }
+            else if (vek < 18)
+            {
+                Console.WriteLine("A nevadí ti, že mi není 18?");
+            }
+            else
+            {
+                this.vek = vek;
+            }
+        }
+
+        public void seznamSe(Clovek druhyClovek) {
+            Console.WriteLine("{0} zdravi osobu {1}", this.jmeno, druhyClovek.jmeno);
+        }
+
+        public static void seznamVsechny(List<Clovek> lide) {
+            foreach (Clovek randiciOsoba in lide)
+            {
+                foreach (Clovek spolurandiciOsoba in lide) {
+                    if (randiciOsoba != spolurandiciOsoba) {
+                        randiciOsoba.seznamSe(spolurandiciOsoba);
+                    }
+                }
+            }           
+        }
+
+        //vlastnosti
+        public string Jmeno {
+            get {
+                this.hodnoceni += 1;
+                return this.jmeno;
+            }
+            set {
+                this.jmeno = value;
+            }
+        }
+
+        public int Vek
+        {
+            set { this.vek = value; }
+        }
+
+        public int Hodnoceni { 
+            get { return this.hodnoceni; }
+        }
+
+        public int Id {
+            get { return id; }
+        }
+    }
+}
