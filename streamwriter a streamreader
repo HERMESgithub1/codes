@@ -1,0 +1,176 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+
+namespace ConsoleApp1
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Muz petr = new Muz("Petr", "Krasavec", 19, false);
+            Muz BradPitt = new Muz("Breeeeda", "Pittak", 50, false);
+            Zena jana = new Zena("Jana", "Krasomila", 18, 0);
+            List<Clovek> lide = new List<Clovek>();
+            lide.Add(petr);
+            lide.Add(jana);
+            lide.Add(BradPitt);
+            //Clovek.seznamVsechny(lide);
+
+            petr.zapisSvePrani(petr);
+            petr.zapisSvePrani(jana);
+            petr.zapisSvePrani(jana);
+            BradPitt.zapisSvePrani(jana);
+
+            List<Clovek> seznamek = jana.ziskejSeznamNapadniku(lide);
+            foreach (Clovek clovek in seznamek) {
+                Console.WriteLine(clovek.Jmeno);
+            }
+        }
+    }
+
+    class Clovek
+    {
+        //field members = vlastnosti
+        protected string jmeno;
+        protected int vek;
+        protected int hodnoceni;
+        protected string altjmeno;
+        public static int id = 0;
+
+        //konstruktor
+        public Clovek(string jmeno, string altjmeno, int vek){
+            id += 1;
+            this.jmeno = jmeno;
+            this.altjmeno = altjmeno;
+            this.hodnoceni = 1;
+            if (vek < 15)
+            {
+                Console.WriteLine("Nemas zde co pohledavat!");
+                this.vek = 15;
+            }
+            else if (vek < 18)
+            {
+                Console.WriteLine("A nevadí ti, že mi není 18?");
+            }
+            else
+            {
+                this.vek = vek;
+            }
+        }
+
+        public void seznamSe(Clovek druhyClovek) {
+            Console.WriteLine("{0} zdravi osobu {1}", this.jmeno, druhyClovek.jmeno);
+        }
+
+        public static void seznamVsechny(List<Clovek> lide) {
+            foreach (Clovek randiciOsoba in lide)
+            {
+                foreach (Clovek spolurandiciOsoba in lide) {
+                    if (randiciOsoba != spolurandiciOsoba) {
+                        randiciOsoba.seznamSe(spolurandiciOsoba);
+                    }
+                }
+            }           
+        }
+
+        //vlastnosti
+        public string Jmeno {
+            get {
+                this.hodnoceni += 1;
+                return this.jmeno;
+            }
+            set {
+                this.jmeno = value;
+            }
+        }
+
+        public int Vek
+        {
+            set { this.vek = value; }
+        }
+
+        public int Hodnoceni { 
+            get { return this.hodnoceni; }
+        }
+
+        public int Id {
+            get { return id; }
+        }
+    }
+
+    class Muz : Clovek {
+
+        private bool pleska { get; }
+
+        public Muz(string jmeno, string altjmeno, int vek, bool pleska) : base(jmeno, altjmeno, vek) {
+            this.pleska = pleska;
+        }
+
+        public void Rihni() {
+            Console.WriteLine("GRUUUUUAH");
+        }
+
+        public void seznamSe(Clovek clovek) {
+            Console.WriteLine("Tak jak to jde? {0}", clovek.Jmeno);
+        }
+
+        public void zapisSvePrani(Clovek clovekKterehoChci) {
+            string wishlist = "wishlist.txt";
+            using (StreamWriter sw = new StreamWriter(wishlist, true))
+            {
+                sw.WriteLine("{0}:{1}", this.jmeno, clovekKterehoChci.Jmeno);
+            }
+
+        }
+
+    }
+
+    class Zena : Clovek
+    {
+        private int modifikace { get; set; }
+
+        public Zena(string jmeno, string altjmeno, int vek, int modifikace):base(jmeno, altjmeno, vek)
+        {
+            this.modifikace = modifikace;
+        }
+
+        public bool JeDnesVyroci(string datum) {
+            if (datum == "29.3")
+            {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        public List<Clovek> ziskejSeznamNapadniku(List<Clovek> uzivateleAplikace) {
+            List<Clovek> napadnici = new List<Clovek>();
+            string wishlist = "wishlist.txt";
+
+            List<string> radky = new List<string>();
+            using (StreamReader sr = new StreamReader(wishlist)) {
+                string radek;
+                while ((radek = sr.ReadLine()) != null) {
+                    radky.Add(radek);
+                }
+            }
+
+            foreach (string radek in radky) {
+                string[] obsahRadku = radek.Split(':');
+                if (obsahRadku[1] == this.Jmeno) {
+                    string jmenoNapadnika = obsahRadku[0];
+                    foreach (Clovek clovek in uzivateleAplikace) {
+                        if (clovek.Jmeno == jmenoNapadnika) {
+                            napadnici.Add(clovek);
+                        }
+                    }
+                }
+            }
+
+            return napadnici;
+        }
+
+    }
+}
