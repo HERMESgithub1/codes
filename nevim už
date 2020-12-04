@@ -1,0 +1,123 @@
+
+using System;
+using System.Collections.Generic;
+using  System.Threading;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
+class TimedValue
+{
+    private double value;
+    private DateTime timestamp;
+
+    public TimedValue(double value)
+    {
+        this.value = value;
+        this.timestamp = DateTime.Now;
+    }
+
+    public double Value
+    {
+        get { return this.value; }
+    }
+
+    public int Age
+    {
+        get
+        {
+            return 
+                (int)(DateTime.Now - this.timestamp).TotalMilliseconds;
+        }
+    }
+}
+
+class Cache
+{
+    Dictionary<string, TimedValue> data = 
+        new Dictionary<string, TimedValue>();
+    private int delay;
+    public Cache(int delay)
+    {
+        this.delay = delay;
+    }
+
+    public bool Contains(string key)
+    {
+        if (!data.ContainsKey(key))
+            return false;
+        TimedValue tv = data[key];
+        return tv.Age < this.delay;
+    }
+
+    public double Get(string key)
+    {
+        if (this.Contains(key))
+            return data[key].Value;
+        else
+        {
+            throw new Exception("Invalid key");
+        }
+    }
+
+    public void Set(string key, double value)
+    {
+        data[key] = new TimedValue(value);
+    }
+}
+
+
+static class WeatherServiceExtension
+{
+    
+    public static async Task<double> GetTemperatureFromWeb(this string location)
+    {
+        Console.WriteLine("získávám data z Internetu");
+        var client = new HttpClient();
+        var request = new HttpRequestMessage
+        {
+            Method = HttpMethod.Get,
+            RequestUri = new Uri(
+                "https://community-open-weather-map.p.rapidapi.com/weather?q=Praha,CZ"),
+            Headers =
+            {
+                { "x-rapidapi-key", "036aa1b26cmsh4ab574bf614e37cp1f9356jsn1feb9fd2b14e" },
+                { "x-rapidapi-host", "community-open-weather-map.p.rapidapi.com" },
+            },
+        };
+        using (var response = await client.SendAsync(request))
+        {
+            response.EnsureSuccessStatusCode();
+            var body = await response.Content.ReadAsStringAsync();
+            JObject wd = JObject.Parse(body);
+            //Console.WriteLine(body);
+            return (double) wd["main"]["temp"] - 273.15;
+        }
+    }
+}
+
+internal class Program
+{
+    public static void Main(string[] args)
+    {
+        Cache c = new Cache(10*60*1000);
+        double t;
+        string misto = "Usti nad Labem";
+        for (int i = 0; i < 3; i++)
+        {
+            if (c.Contains(misto))
+            {
+                t = c.Get(misto);
+            }
+            else
+            {
+                t = misto.GetTemperatureFromWeb().Result;
+                c.Set(misto, t);
+            }
+
+            Console.WriteLine(t);
+            Thread.Sleep(2000);
+        }
+    }
+}
